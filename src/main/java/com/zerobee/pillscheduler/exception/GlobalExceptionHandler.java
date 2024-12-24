@@ -10,6 +10,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    @ExceptionHandler(TokenNotFound.class)
+    public ResponseEntity<CustomResponse<Void>> handleTokenNotFound(TokenNotFound ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new CustomResponse<>(HttpStatus.BAD_REQUEST, "Token Not Found", null));
+    }
+    
+    @ExceptionHandler(InvalidToken.class)
+    public ResponseEntity<CustomResponse<Void>> handleInvalidToken(InvalidToken ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new CustomResponse<>(HttpStatus.UNAUTHORIZED, "Invalid Token", null));
+    }
+    
+    
     // IllegalStateException handler
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<CustomResponse<String>> handleIllegalStateException(IllegalStateException ex) {
