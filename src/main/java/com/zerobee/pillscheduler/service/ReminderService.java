@@ -9,6 +9,7 @@ import com.zerobee.pillscheduler.entity.Reminder;
 import com.zerobee.pillscheduler.entity.User;
 import com.zerobee.pillscheduler.enums.Flag;
 import com.zerobee.pillscheduler.enums.Status;
+import com.zerobee.pillscheduler.exception.ReminderNotFoundException;
 import com.zerobee.pillscheduler.repository.ReminderRepository;
 import com.zerobee.pillscheduler.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -79,4 +80,18 @@ public class ReminderService {
             throw new IllegalArgumentException("Invalid Firebase ID Token", e);
         }
     }
+    
+    public void deleteReminderById(String token, Integer id) {
+        // Extract user ID from the token
+        String userId = extractUserIdFromToken(token);
+        
+        // Check if reminder exists and belongs to the user
+        Reminder reminder = reminderRepository.findById(id)
+                .filter(r -> r.getUser().getId().equals(userId))  // Ensure the reminder belongs to the user
+                .orElseThrow(() -> new ReminderNotFoundException("Reminder with ID " + id + " not found or not belonging to the user."));
+        
+        // Delete the reminder (which will also delete associated doses if cascading is set)
+        reminderRepository.delete(reminder);
+    }
+    
 }
