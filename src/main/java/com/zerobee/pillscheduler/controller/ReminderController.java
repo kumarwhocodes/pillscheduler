@@ -40,4 +40,18 @@ public class ReminderController {
                 reminders
         );
     }
+    
+    @DeleteMapping("/delete/{id}")
+    public CustomResponse<Void> deleteReminder(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Integer id
+    ) {
+        reminderService.deleteReminderById(token, id);
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Reminder deleted successfully.",
+                null
+        );
+    }
+    
 }
