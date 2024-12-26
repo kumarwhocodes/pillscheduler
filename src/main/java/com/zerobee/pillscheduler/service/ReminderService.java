@@ -82,16 +82,40 @@ public class ReminderService {
     }
     
     public void deleteReminderById(String token, Integer id) {
-        // Extract user ID from the token
         String userId = extractUserIdFromToken(token);
         
-        // Check if reminder exists and belongs to the user
         Reminder reminder = reminderRepository.findById(id)
                 .filter(r -> r.getUser().getId().equals(userId))  // Ensure the reminder belongs to the user
                 .orElseThrow(() -> new ReminderNotFoundException("Reminder with ID " + id + " not found or not belonging to the user."));
         
-        // Delete the reminder (which will also delete associated doses if cascading is set)
         reminderRepository.delete(reminder);
     }
+    
+    public void markDoseAsTaken(String token, Integer reminderId, Integer doseId) {
+        String userId = extractUserIdFromToken(token);
+        
+        Reminder reminder = reminderRepository.findById(reminderId)
+                .orElseThrow(() -> new ReminderNotFoundException("Reminder not found:" + reminderId));
+        
+        if (!reminder.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("This reminder does not belong to the user");
+        }
+        
+        // Validate the dose exists
+        Dose dose = reminder.getDoses().stream()
+                .filter(d -> d.getId().equals(doseId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Dose not found"));
+        
+        int newRemainingDoses = reminder.getRemaining_doses() - 1;
+        reminder.setRemaining_doses(Math.max(newRemainingDoses, 0));
+        
+        if (reminder.getRemaining_doses() == 0) {
+            reminder.setStatus(Status.TAKEN);
+        }
+        
+        reminderRepository.save(reminder);
+    }
+    
     
 }

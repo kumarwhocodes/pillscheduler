@@ -54,4 +54,19 @@ public class ReminderController {
         );
     }
     
+    @PutMapping("/mark-taken/{reminderId}/{doseId}")
+    public CustomResponse<Void> markDoseAsTaken(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Integer reminderId,
+            @PathVariable Integer doseId
+    ) {
+        reminderService.markDoseAsTaken(token, reminderId, doseId);
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Dose marked as taken successfully.",
+                null
+        );
+    }
+    
+    
 }
