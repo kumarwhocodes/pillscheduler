@@ -8,6 +8,7 @@ import com.zerobee.pillscheduler.entity.Dose;
 import com.zerobee.pillscheduler.entity.Reminder;
 import com.zerobee.pillscheduler.entity.User;
 import com.zerobee.pillscheduler.enums.Flag;
+import com.zerobee.pillscheduler.enums.Frequency;
 import com.zerobee.pillscheduler.enums.Status;
 import com.zerobee.pillscheduler.exception.ReminderNotFoundException;
 import com.zerobee.pillscheduler.repository.ReminderRepository;
@@ -30,12 +31,18 @@ public class ReminderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
+        if (reminderDTO.getFrequency() == Frequency.CUSTOM &&
+                (reminderDTO.getDays() == null || reminderDTO.getDays().isEmpty())) {
+            throw new IllegalArgumentException("Custom frequency requires specifying days");
+        }
+        
         Reminder reminder = Reminder.builder()
                 .r_name(reminderDTO.getR_name())
                 .r_photo(reminderDTO.getR_photo())
                 .r_type(reminderDTO.getR_type())
                 .category(reminderDTO.getCategory())
                 .frequency(reminderDTO.getFrequency())
+                .days(reminderDTO.getDays())
                 .start_date_time(reminderDTO.getStart_date_time())
                 .end_date_time(reminderDTO.getEnd_date_time())
                 .notes(reminderDTO.getNotes())
