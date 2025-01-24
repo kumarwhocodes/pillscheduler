@@ -2,6 +2,7 @@ package com.zerobee.pillscheduler.dto;
 
 import com.zerobee.pillscheduler.entity.Reminder;
 import com.zerobee.pillscheduler.enums.Flag;
+import com.zerobee.pillscheduler.enums.Frequency;
 import com.zerobee.pillscheduler.enums.ReminderType;
 import com.zerobee.pillscheduler.enums.Status;
 import lombok.*;
@@ -24,7 +25,8 @@ public class ReminderDTO {
     private String category; // tablet, syrup (applicable for medicines)
     private List<DoseDTO> doses;
     private Integer remaining_doses;
-    private String frequency;
+    private Frequency frequency;
+    private String days;
     private LocalDateTime start_date_time;
     private LocalDateTime end_date_time;
     private String notes;
@@ -40,6 +42,7 @@ public class ReminderDTO {
                 .r_type(r_type)
                 .category(category)
                 .frequency(frequency)
+                .days(days)
                 .start_date_time(start_date_time)
                 .end_date_time(end_date_time)
                 .notes(notes)

@@ -12,7 +12,7 @@ import java.io.IOException;
 @Configuration
 public class FirebaseConfig {
     
-    String FIREBASE_SERVICE_ACCOUNT_JSON_PATH = "dashdrop-1d768-firebase-adminsdk-r34m3-d84a8dabe5.json";
+    String FIREBASE_SERVICE_ACCOUNT_JSON_PATH = "dashdrop-1d768-firebase-adminsdk-r34m3-4c4e721a0c.json";
     
     @Bean
     public FirebaseApp initializeFirebase() throws IOException {
