@@ -13,14 +13,17 @@ import com.zerobee.pillscheduler.enums.Status;
 import com.zerobee.pillscheduler.exception.ReminderNotFoundException;
 import com.zerobee.pillscheduler.repository.ReminderRepository;
 import com.zerobee.pillscheduler.repository.UserRepository;
+import com.zerobee.pillscheduler.utils.FrequencyLogic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReminderService {
+public class ReminderService implements FrequencyLogic {
     
     private final UserRepository userRepository;
     private final ReminderRepository reminderRepository;
@@ -66,10 +69,70 @@ public class ReminderService {
         return savedReminder.toReminderDTO();
     }
     
-    public List<ReminderDTO> getRemindersForUser(String token) {
+    public List<ReminderDTO> fetchRemindersForUser(String token) {
         String userId = extractUserIdFromToken(token);
         
         return reminderRepository.findByUserId(userId).stream()
+                .map(Reminder::toReminderDTO)
+                .toList();
+    }
+    
+    public List<ReminderDTO> fetchActiveReminders(String token, String flag, String status) {
+        String userId = extractUserIdFromToken(token);
+        
+        List<Reminder> reminders;
+        if (flag != null && status != null) {
+            reminders = reminderRepository.findByUserIdAndFlagAndStatus(
+                    userId,
+                    Flag.valueOf(flag),
+                    Status.valueOf(status)
+            );
+        } else {
+            reminders = reminderRepository.findByUserId(userId);
+        }
+        return reminders.stream()
+                .map(Reminder::toReminderDTO)
+                .toList();
+    }
+    
+    public List<ReminderDTO> fetchRemindersByFrequency(String token, Frequency frequency) {
+        String userId = extractUserIdFromToken(token);
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek currentDay = now.getDayOfWeek();
+        
+        return reminderRepository.findByUserId(userId).stream()
+                .filter(reminder -> reminder.getFrequency() == frequency)
+                .filter(reminder -> {
+                    return switch (frequency) {
+                        case DAILY -> true;
+                        case ALTERNATE_DAYS -> isAlternateDayReminder(reminder, now);
+                        case CUSTOM -> isCustomDayReminder(reminder, currentDay);
+                        default -> false;
+                    };
+                })
+                .map(Reminder::toReminderDTO)
+                .toList();
+    }
+    
+    public List<ReminderDTO> fetchActiveRemindersByFrequency(String token, String flag, String status, Frequency frequency) {
+        String userId = extractUserIdFromToken(token);
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek currentDay = now.getDayOfWeek();
+        
+        return reminderRepository.findByUserId(userId).stream()
+                .filter(reminder ->
+                        (flag == null || reminder.getFlag().name().equals(flag)) &&
+                                (status == null || reminder.getStatus().name().equals(status)) &&
+                                reminder.getFrequency() == frequency
+                )
+                .filter(reminder -> {
+                    return switch (frequency) {
+                        case DAILY -> true;
+                        case ALTERNATE_DAYS -> isAlternateDayReminder(reminder, now);
+                        case CUSTOM -> isCustomDayReminder(reminder, currentDay);
+                        default -> false;
+                    };
+                })
                 .map(Reminder::toReminderDTO)
                 .toList();
     }
