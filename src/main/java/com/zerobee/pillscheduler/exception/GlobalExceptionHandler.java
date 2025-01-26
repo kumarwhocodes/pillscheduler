@@ -24,10 +24,39 @@ public class GlobalExceptionHandler {
                 .body(new CustomResponse<>(HttpStatus.UNAUTHORIZED, "Invalid Token", null));
     }
     
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<CustomResponse<Void>> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new CustomResponse<>(
+                        HttpStatus.NOT_FOUND,
+                        "User Not Found",
+                        null
+                ));
+    }
+    
+    @ExceptionHandler(ReminderNotFoundException.class)
+    public ResponseEntity<CustomResponse<Void>> handleReminderNotFoundException(ReminderNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new CustomResponse<>(
+                        HttpStatus.NOT_FOUND,
+                        "Reminder Not Found",
+                        null
+                ));
+    }
     
     // IllegalStateException handler
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<CustomResponse<String>> handleIllegalStateException(IllegalStateException ex) {
+        return new ResponseEntity<>(
+                new CustomResponse<>(HttpStatus.BAD_REQUEST, ex.getMessage(), "ERROR"),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<CustomResponse<String>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return new ResponseEntity<>(
                 new CustomResponse<>(HttpStatus.BAD_REQUEST, ex.getMessage(), "ERROR"),
                 HttpStatus.BAD_REQUEST
