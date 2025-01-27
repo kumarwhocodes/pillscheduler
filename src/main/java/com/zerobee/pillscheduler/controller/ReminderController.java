@@ -2,6 +2,7 @@ package com.zerobee.pillscheduler.controller;
 
 import com.zerobee.pillscheduler.dto.CustomResponse;
 import com.zerobee.pillscheduler.dto.ReminderDTO;
+import com.zerobee.pillscheduler.enums.Frequency;
 import com.zerobee.pillscheduler.service.ReminderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,14 +31,58 @@ public class ReminderController {
     }
     
     @GetMapping("/fetch")
-    public CustomResponse<List<ReminderDTO>> getReminders(
+    public CustomResponse<List<ReminderDTO>> fetchReminders(
             @RequestHeader("Authorization") String token) {
         
-        List<ReminderDTO> reminders = reminderService.getRemindersForUser(token);
+        List<ReminderDTO> reminders = reminderService.fetchRemindersForUser(token);
         return new CustomResponse<>(
                 HttpStatus.OK,
                 "Reminders fetched successfully",
                 reminders
+        );
+    }
+    
+    @GetMapping("/fetch/active")
+    public CustomResponse<List<ReminderDTO>> fetchActiveReminders(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("flag") String flag,
+            @RequestParam("status") String status
+    ){
+        List<ReminderDTO> activeReminders = reminderService.fetchActiveReminders(token, flag, status);
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Active Reminders Fetched Successfully!",
+                activeReminders
+        );
+    }
+    
+    @GetMapping("/fetch/by-frequency")
+    public CustomResponse<List<ReminderDTO>> fetchRemindersByFrequency(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("frequency") Frequency frequency
+    ) {
+        List<ReminderDTO> frequencyReminders = reminderService.fetchRemindersByFrequency(token, frequency);
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Reminders fetched by frequency successfully!",
+                frequencyReminders
+        );
+    }
+    
+    @GetMapping("/fetch/active-by-frequency")
+    public CustomResponse<List<ReminderDTO>> fetchActiveRemindersByFrequency(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("flag") String flag,
+            @RequestParam("status") String status,
+            @RequestParam("frequency") Frequency frequency
+    ) {
+        List<ReminderDTO> activeFrequencyReminders = reminderService.fetchActiveRemindersByFrequency(
+                token, flag, status, frequency
+        );
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Active Reminders by Frequency Fetched Successfully!",
+                activeFrequencyReminders
         );
     }
     
