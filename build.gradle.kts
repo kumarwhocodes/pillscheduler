@@ -37,6 +37,10 @@ dependencies {
 	// Firebase Admin SDK Dependency
 	implementation ("com.google.firebase:firebase-admin:8.1.0")
 
+	// Swagger 
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+
+
 }
 
 tasks.withType<Test> {

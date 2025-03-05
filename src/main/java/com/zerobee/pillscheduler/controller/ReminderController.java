@@ -42,12 +42,25 @@ public class ReminderController {
         );
     }
     
+    @GetMapping("/fetch/{id}")
+    public CustomResponse<ReminderDTO> fetchReminderById(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("id") Integer id
+    ) {
+        ReminderDTO reminderDTO = reminderService.fetchReminderById(token, id);
+        return new CustomResponse<>(
+                HttpStatus.OK,
+                "Reminder fetched successfully",
+                reminderDTO
+        );
+    }
+    
     @GetMapping("/fetch/active")
     public CustomResponse<List<ReminderDTO>> fetchActiveReminders(
             @RequestHeader("Authorization") String token,
             @RequestParam("flag") String flag,
             @RequestParam("status") String status
-    ){
+    ) {
         List<ReminderDTO> activeReminders = reminderService.fetchActiveReminders(token, flag, status);
         return new CustomResponse<>(
                 HttpStatus.OK,

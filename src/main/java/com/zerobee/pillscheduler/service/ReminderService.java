@@ -77,6 +77,18 @@ public class ReminderService implements FrequencyLogic {
                 .toList();
     }
     
+    public ReminderDTO fetchReminderById(String token, Integer id) {
+        String userId = extractUserIdFromToken(token);
+        return reminderRepository.findById(id)
+                .map(reminder -> {
+                    if (!reminder.getUser().getId().equals(userId)) {
+                        throw new ReminderNotFoundException("You are not authorized to access this reminder");
+                    }
+                    return reminder.toReminderDTO();
+                })
+                .orElseThrow(() -> new ReminderNotFoundException("Reminder not found with id: " + id));
+    }
+    
     public List<ReminderDTO> fetchActiveReminders(String token, String flag, String status) {
         String userId = extractUserIdFromToken(token);
         

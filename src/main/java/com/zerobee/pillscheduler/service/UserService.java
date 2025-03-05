@@ -7,6 +7,7 @@ import com.google.firebase.auth.UserRecord;
 import com.zerobee.pillscheduler.dto.AccessTokenBody;
 import com.zerobee.pillscheduler.dto.UserDTO;
 import com.zerobee.pillscheduler.entity.User;
+import com.zerobee.pillscheduler.exception.FirebaseOperationException;
 import com.zerobee.pillscheduler.exception.InvalidToken;
 import com.zerobee.pillscheduler.exception.TokenNotFound;
 import com.zerobee.pillscheduler.exception.UserNotFoundException;
@@ -51,6 +52,45 @@ public class UserService {
         
         User user = repo.findById(uid).orElseThrow(InvalidToken::new);
         return user.toUserDTO();
+    }
+    
+    public UserDTO updateUser(String token, UserDTO userDTO) {
+        if (token == null || token.isBlank() || !token.startsWith("Bearer")) {
+            throw new TokenNotFound();
+        }
+        String actualToken = token.substring(7);
+        String uid = extractUidFromToken(actualToken);
+        
+        if (!uid.equals(userDTO.getId())) {
+            throw new UserNotFoundException("You can only update your own profile");
+        }
+        
+        User existingUser = repo.findById(uid)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + uid));
+        
+        existingUser.setName(userDTO.getName());
+        existingUser.setPhoto_url(userDTO.getPhoto_url());
+        
+        User updatedUser = repo.save(existingUser);
+        return updatedUser.toUserDTO();
+    }
+    
+    public void deleteUser(String token) {
+        if (token == null || token.isBlank() || !token.startsWith("Bearer")) {
+            throw new TokenNotFound();
+        }
+        String actualToken = token.substring(7);
+        String uid = extractUidFromToken(actualToken);
+        
+        User existingUser = repo.findById(uid)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + uid));
+        
+        try {
+            FirebaseAuth.getInstance().deleteUser(uid);
+            repo.delete(existingUser);
+        } catch (FirebaseAuthException e) {
+            throw new FirebaseOperationException("Failed to delete user from Firebase: " + e.getMessage());
+        }
     }
     
     private Optional<UserRecord> fetchFirebaseUserFromToken(String token) {

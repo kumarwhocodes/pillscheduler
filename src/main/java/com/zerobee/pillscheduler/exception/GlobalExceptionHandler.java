@@ -46,6 +46,18 @@ public class GlobalExceptionHandler {
                 ));
     }
     
+    @ExceptionHandler(FirebaseOperationException.class)
+    public ResponseEntity<CustomResponse<String>> handleFirebaseOperationException(FirebaseOperationException e) {
+        return new ResponseEntity<>(
+                new CustomResponse<>(
+                        HttpStatus.UNAUTHORIZED,
+                        e.getMessage(),
+                        "Error deleting user from firebase."
+                ),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+    
     // IllegalStateException handler
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<CustomResponse<String>> handleIllegalStateException(IllegalStateException ex) {
