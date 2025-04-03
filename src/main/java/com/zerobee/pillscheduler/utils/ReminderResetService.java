@@ -18,7 +18,7 @@ public class ReminderResetService {
     
     private final ReminderRepository reminderRepository;
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional // Ensures a session is available
     public void resetRemainingDoses() {
         log.info("Starting daily reset of remaining doses...");
