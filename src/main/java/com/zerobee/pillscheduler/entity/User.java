@@ -27,8 +27,8 @@ public class User {
     
     private String photo_url;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Reminder> reminders = new ArrayList<>();
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//    private List<Reminder> reminders = new ArrayList<>();
     
     public UserDTO toUserDTO() {
         return UserDTO.builder()

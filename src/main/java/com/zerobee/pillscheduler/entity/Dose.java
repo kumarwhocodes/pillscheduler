@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
@@ -22,6 +23,9 @@ public class Dose {
     
     private LocalTime doseTime;
     
+    @Column(nullable = false)
+    private Boolean taken = false;
+    
     @ManyToOne
     @JoinColumn(name = "reminder_id", nullable = false)
     private Reminder reminder;
@@ -30,6 +34,7 @@ public class Dose {
         return DoseDTO.builder()
                 .id(id)
                 .doseTime(doseTime)
+                .taken(taken)
                 .build();
     }
 }

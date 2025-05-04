@@ -29,11 +29,11 @@ public class Reminder {
     private String r_photo;
     
     @Enumerated(EnumType.STRING)
-    private ReminderType r_type; // medicine, heart rate, insulin, BP
+    private ReminderType r_type;                // medicine, heart rate, insulin, BP
     
-    private String category; // tablet, syrup (applicable for medicines)
+    private String category;                    // tablet, syrup (applicable for medicines)
     @Enumerated(EnumType.STRING)
-    private Frequency frequency;
+    private Frequency frequency;                //daily, alternate_days, custom
     private String days;
     private LocalDateTime start_date_time;
     private LocalDateTime end_date_time;
